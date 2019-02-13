@@ -166,6 +166,8 @@ soup = BeautifulSoup(response.text.decode('utf8'),"lxml")
 #print soup.body.find('input', attrs={'name':'wa'}).get('value')
 #print soup.body.find('input', attrs={'name':'wctx'}).get('value')
 
+
+#This is some specific logic just for auth0. Other FBL's wont need it.
 newpayload = {}
 newpayload["wresult"] = soup.body.find('input', attrs={'name':'wresult'}).get('value')
 newpayload["wa"] = soup.body.find('input', attrs={'name':'wa'}).get('value')

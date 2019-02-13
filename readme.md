@@ -8,14 +8,35 @@ The code is fairly heavily commented, and I would sugget a read of it to help yo
 
 While you could tweak this to work with other FBL SAML IDPs, this has alot of enhancements to work out of the box and "as is" with auth0 FBL SAML.
 
+## Customizing to your environment.
+
+This version .1 effort does not feature a config file and unfortunately the variables themselves will need to be modified.
+
+
 ## Invocation
 
 Simply call the script with your python 2 executable after all dependencies have been resolved.
+
+after that you can then use the "saml" profile as it has been saved to your ~.aws/credentials file.
+
+This can be referenced in your aws SDK, or if using the cli add "--profile saml" to all your one-liners.
 
 
 ## Dependencies
 
 see requirements.tst
+
+## Pre-Requisite steps
+
+You'll need to create an Auth0 Tenant (free tier works), and you'll need to create a new client(application), and a user database (Connections->Database) filled with a few users, and enable that user database for your Application both in the database window and in the application window.
+
+You'll need to configure the client to be a SAML IDP by enabling  the SAML webapp on the application in Application->Addons
+
+Detailed steps:
+
+https://auth0.com/docs/protocols/saml/saml-idp-generic
+
+https://auth0.com/docs/integrations/aws/sso
 
 ## Auth0 Rules
 
