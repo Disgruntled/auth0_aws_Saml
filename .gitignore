@@ -134,6 +134,7 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
+
 # Environments
 .env
 .venv
@@ -165,5 +166,6 @@ liam*
 *.swp
 sacrifice.txt
 sacrifice_return.txt
+saml_formauth.conf
 
 unreadable

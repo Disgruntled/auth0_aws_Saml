@@ -21,6 +21,21 @@ after that you can then use the "saml" profile as it has been saved to your ~.aw
 
 This can be referenced in your aws SDK, or if using the cli add "--profile saml" to all your one-liners.
 
+## Config File
+
+Recently added capabilities:
+
+Will read from samlapi_formauth.conf to parse a config. Example configuration provided.
+
+The variables are all things you will need to get from auth0, including:
+
+your tenant (auth0 displayname)
+your client_id
+your auth0 userpool (connection)
+username/password
+output format/region to your own AWS taste
+
+
 
 ## Dependencies
 

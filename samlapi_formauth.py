@@ -15,16 +15,22 @@ from bs4 import BeautifulSoup
 from os.path import expanduser
 from urlparse import urlparse, urlunparse
 
+
+#read the script
+
+scriptConfig = ConfigParser.RawConfigParser()
+scriptConfig.read('saml_formauth.conf')
+
 ##########################################################################
 # Variables
 
 # region: The default AWS region that this script will connect
 # to for all API calls
-region = 'us-east-1'
+region = scriptConfig.get("default","region")
 
 # output format: The AWS CLI output format that will be configured in the
 # saml profile (affects subsequent CLI calls)
-outputformat = 'json'
+outputformat = scriptConfig.get("default","output")
 
 # awsconfigfile: The file where this script will store the temp
 # credentials under the saml profile
@@ -37,32 +43,23 @@ awsconfigfile = '/.aws/credentials'
 # verification is done, False should only be used for dev/test
 sslverification = True
 
-# idpentryurl: The initial url that starts the authentication process.
-# You can get this from your Auth0 Saml Client set up
-#this is the LANDING page of auth0, and not the FBL form that is posted to
-idpentryurl = 'my_idp_entry_url'
-
-
-# Uncomment to enable low level debugging
-#logging.basicConfig(level=logging.DEBUG)
-
 
 #the client_id from your auth0 client.
 #you can get this from the page about you client . Client ID's are not secrets and can be stored in code/config without further concern
 
 
-client_id = "My_client_id_from_auth0_that_I_setup_for_saml"
+client_id =  scriptConfig.get("default","client_id")
 
 
 
 #the connection from auth0
 #THis is your userpool connection. This is required for the login action.
 
-connection = "My_Userpool_connection_from_auth0_that_I_put_users_on"
+connection = scriptConfig.get("default","connection")
 
 
 ###Tenant. Your auth0 tenant name. This is your username on auth0 (not email!)
-tenant = "my_auth0_tenant_that_I_got"
+tenant = scriptConfig.get("default","tenant")
 
 
 ####The actual URL we will be posting or login payload to, after we get our state/csrf set.
@@ -74,16 +71,20 @@ idpauthformsubmiturl = "https://"+tenant+".auth0.com/usernamepassword/login"
 
 
 
-username = "sample.user@yourDomain.com"
+username = scriptConfig.get("default","username")
 
 ###Enter a valid password. the script-as is does not support 2fa but it would NOT be difficult to make it support 2fa if you want to plum it in
-password = "A_Sample_Credential_battery_stapler"
+password = scriptConfig.get("default","password")
 
 
+# idpentryurl: The initial url that starts the authentication process.
+# You can get this from your Auth0 Saml Client set up
+#this is the LANDING page of auth0, and not the FBL form that is posted to
+idpentryurl = 'https://{0}.auth0.com/samlp/{1}?connection={2}'.format(tenant,client_id,connection)
 
 ##########################################################################
 ##########################################################################
-###############################Let' boogie################################
+###############################Lets boogie################################
 ##########################################################################
 ##########################################################################
 
@@ -273,11 +274,14 @@ print('Your new access key pair has been stored in the AWS configuration file {0
 print('Note that it will expire at {0}.'.format(token.credentials.expiration))
 print('After this time, you may safely rerun this script to refresh your access key pair.')
 print('To use this credential, call the AWS CLI with the --profile option (e.g. aws --profile saml ec2 describe-instances).')
+print('to export this credential to another system, copy paste the following:')
+print('')
+print('export AWS_ACCESS_KEY_ID="{}"'.format(token.credentials.access_key) )
+print('export AWS_SECRET_ACCESS_KEY="{}"'.format(token.credentials.secret_key) )
+print('export AWS_SESSION_TOKEN="{}"'.format(token.credentials.session_token) )
+print('export AWS_DEFAULT_REGION="{}"'.format(region) )
+print('export AWS_DEFAULT_OUTPUT="{}"'.format(outputformat) )
+print('')
 print('----------------------------------------------------------------\n\n')
 
-# Use the AWS STS token to list all of the S3 buckets
-s3conn = boto.s3.connect_to_region(region,
-                     aws_access_key_id=token.credentials.access_key,
-                     aws_secret_access_key=token.credentials.secret_key,
-                     security_token=token.credentials.session_token)
 
