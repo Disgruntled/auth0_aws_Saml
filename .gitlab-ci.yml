@@ -1,7 +1,7 @@
 image: python
 
 before_script:
-  - "pip3 -r requirements3.txt"
+  - "pip3 install -r requirements3.txt"
 
 job1:
   script: "python3 -m py_compile samlapi_formauth3.py"
