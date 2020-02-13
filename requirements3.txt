@@ -1,0 +1,5 @@
+boto
+requests
+beautifulsoup
+configparser
+lxml
