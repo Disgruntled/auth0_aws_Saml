@@ -8,6 +8,9 @@ The code is fairly heavily commented, and I would sugget a read of it to help yo
 
 While you could tweak this to work with other FBL SAML IDPs, this has alot of enhancements to work out of the box and "as is" with auth0 FBL SAML.
 
+Two flavours of this script are provided, samlapi_formauth.py for python2 and samlap_formauth3.py for python3.
+
+
 ## Customizing to your environment.
 
 This version .1 effort does not feature a config file and unfortunately the variables themselves will need to be modified.
@@ -20,6 +23,10 @@ Simply call the script with your python 2 executable after all dependencies have
 after that you can then use the "saml" profile as it has been saved to your ~.aws/credentials file.
 
 This can be referenced in your aws SDK, or if using the cli add "--profile saml" to all your one-liners.
+
+## Debugging
+
+This is a science experiment with no built in error checking. But to that extent, there is only really a few places where it can mess up. Responses from Auth0/AWS are about the jist of it, and debugging should not be complex.
 
 ## Config File
 
@@ -39,7 +46,9 @@ output format/region to your own AWS taste
 
 ## Dependencies
 
-see requirements.tst
+see requirements.txt
+
+note urlparse is folded into urllib in python3.
 
 ## Pre-Requisite steps
 
