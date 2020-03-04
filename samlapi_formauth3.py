@@ -254,8 +254,8 @@ config.read(filename)
 
 # Put the credentials into a saml specific section instead of clobbering
 # the default credentials
-if not config.has_section('saml'):
-    config.add_section('saml')
+if not config.has_section('default'):
+    config.add_section('default')
 
 config.set('saml', 'output', outputformat)
 config.set('saml', 'region', region)
