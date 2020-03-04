@@ -257,11 +257,11 @@ config.read(filename)
 if not config.has_section('default'):
     config.add_section('default')
 
-config.set('saml', 'output', outputformat)
-config.set('saml', 'region', region)
-config.set('saml', 'aws_access_key_id', token.credentials.access_key)
-config.set('saml', 'aws_secret_access_key', token.credentials.secret_key)
-config.set('saml', 'aws_session_token', token.credentials.session_token)
+config.set('default', 'output', outputformat)
+config.set('default', 'region', region)
+config.set('default', 'aws_access_key_id', token.credentials.access_key)
+config.set('default', 'aws_secret_access_key', token.credentials.secret_key)
+config.set('default', 'aws_session_token', token.credentials.session_token)
 
 # Write the updated config file
 with open(filename, 'w+') as configfile:
