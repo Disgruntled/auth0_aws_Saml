@@ -10,11 +10,17 @@ While you could tweak this to work with other FBL SAML IDPs, this has alot of en
 
 Two flavours of this script are provided, samlapi_formauth.py for python2 and samlap_formauth3.py for python3.
 
+## Getting a console session from the AWS credentials
 
-## Customizing to your environment.
+The script "consoleSession.py" will take the AWS access key/secret access key/session tokena and use them to create a url you can use for the AWS console.
+
+It will attempt to read the access key pair+session token from environment variables, then ~.aws/credentials default profile if nothing exists int he environment.
+
+This script is using modified boilerplate code provided by AWS. Not like the samlapi_formauth maincode.
+
+## Customizing to your environment
 
 This version .1 effort does not feature a config file and unfortunately the variables themselves will need to be modified.
-
 
 ## Invocation
 
@@ -42,8 +48,6 @@ your auth0 userpool (connection)
 username/password
 output format/region to your own AWS taste
 
-
-
 ## Dependencies
 
 see requirements.txt
@@ -66,5 +70,4 @@ https://auth0.com/docs/integrations/aws/sso
 
 The authorization model fort this is set at the auth0 rule model. Each user in your auth0 user pool requires an entry in your auth0 tenants rules to mape them to a list of IAM roles on the accounts that trust your SAML IDP
 
-You could do one rule per user, or one 
-
+You could do one rule per user, or one
