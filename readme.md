@@ -18,10 +18,24 @@ It will attempt to read the access key pair+session token from environment varia
 
 This can be overriden with arguments -c to specify a credfile, and -p for a profile
 
+--metadata is a neat flag that tries to get credentials from the metadata endpoint. It allows you to use the AWS console as an EC2 instance.
+
 This script is using modified boilerplate code provided by AWS. Not like the samlapi_formauth maincode.
 
 ```bash
-consoleSession.py -c "path/to/credentials/file" -p "profile"
+python3 consoleSession.py -c "path/to/credentials/file" -p "profile"
+```
+
+or
+
+```bash
+python3 consoleSession.py
+```
+
+or
+
+```bash
+python3 consoleSession.py --metadata
 ```
 
 ## Customizing to your environment
@@ -74,6 +88,4 @@ https://auth0.com/docs/integrations/aws/sso
 
 ## Auth0 Rules
 
-The authorization model fort this is set at the auth0 rule model. Each user in your auth0 user pool requires an entry in your auth0 tenants rules to mape them to a list of IAM roles on the accounts that trust your SAML IDP
-
-You could do one rule per user, or one
+The authorization model for this is set at the auth0 rule model. Each user in your auth0 user pool requires an entry in your auth0 tenants rules to mape them to a list of IAM roles on the accounts that trust your SAML IDP

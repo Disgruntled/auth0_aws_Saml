@@ -11,6 +11,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Creates an AWS console sign in link from an assumed role")
 parser.add_argument('-p',type=str, action="store", dest="profile",help="Profile inside of aws creds file you want used. Defaults to \"default\". If set, env variables are not read.",nargs='?')
 parser.add_argument('-c',type=str, action="store", dest="credfile",help="Absolute path to AWS credentials file. If set, env variables are not read.",nargs='?')
+parser.add_argument('--metadata', action="store_true", dest="metadata",help="Tries to get credentials from the metadata endpoint (169.254.169.254). if set, only metadata is attempted")
 args = parser.parse_args()
 
 
@@ -51,20 +52,36 @@ def getCredsFromFile(profile,credentialsfile):
         config.read(credentialsfile)
     except:
         raise("Could not open AWS credentials file")
-    url_credentials['sessionId'] = config.get("default", 'aws_access_key_id')
+    url_credentials['sessionId'] = config.get(profile, 'aws_access_key_id')
     url_credentials['sessionKey'] = config.get(profile, 'aws_secret_access_key')
     url_credentials['sessionToken'] = config.get(profile, 'aws_session_token')
     json_string_with_temp_credentials = json.dumps(url_credentials)
     return(json_string_with_temp_credentials)
 
+
+def getCredsFromMetaData():
+    url_credentials = {}
+    roleName = requests.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/').text
+    ec2Creds = json.loads(requests.get("http://169.254.169.254/latest/meta-data/iam/security-credentials/{}".format(roleName)).text)
+    url_credentials['sessionId'] = ec2Creds['AccessKeyId']
+    url_credentials['sessionKey'] = ec2Creds['SecretAccessKey']
+    url_credentials['sessionToken'] = ec2Creds['Token']
+    json_string_with_temp_credentials = json.dumps(url_credentials)
+    return(json_string_with_temp_credentials)
+
+
+
 #Default behavior: if no arguments, first try environment, then try default aws credential file with 'default' profile
-if args.credfile == None and args.profile == None:
+if args.credfile == None and args.profile == None and args.metadata == False:
     if environ.get('AWS_ACCESS_KEY_ID') != None:
         json_string_with_temp_credentials = getCredsFromEnv()
     else:
         json_string_with_temp_credentials = getCredsFromFile(profile,credentialsfile)
-else:
+elif args.metadata == False:
     json_string_with_temp_credentials = getCredsFromFile(profile,credentialsfile)
+
+if args.metadata == True:
+    json_string_with_temp_credentials = getCredsFromMetaData()
 
 
 # Step 2. Make request to AWS federation endpoint to get sign-in token. Construct the parameter string with
