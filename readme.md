@@ -14,9 +14,15 @@ Two flavours of this script are provided, samlapi_formauth.py for python2 and sa
 
 The script "consoleSession.py" will take the AWS access key/secret access key/session tokena and use them to create a url you can use for the AWS console.
 
-It will attempt to read the access key pair+session token from environment variables, then ~.aws/credentials default profile if nothing exists int he environment.
+It will attempt to read the access key pair+session token from environment variables, then ~.aws/credentials default profile if nothing exists in the environment.
+
+This can be overriden with arguments -c to specify a credfile, and -p for a profile
 
 This script is using modified boilerplate code provided by AWS. Not like the samlapi_formauth maincode.
+
+```bash
+consoleSession.py -c "path/to/credentials/file" -p "profile"
+```
 
 ## Customizing to your environment
 

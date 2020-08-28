@@ -1,53 +1,73 @@
 import urllib, json, sys
-import requests # 'pip install requests'
-import boto3 # AWS SDK for Python (Boto3) 'pip install boto3'
+import requests
+import boto3
 from os import environ
 from os.path import expanduser
 import configparser as ConfigParser
+import argparse
 
-# Step 1: Authenticate user in your own identity system.
+############################Arg parsing logic##################################
 
-# Step 2: Using the access keys for an IAM user in your AWS account,
-# call "AssumeRole" to get temporary access keys for the federated user
-
-# Note: Calls to AWS STS AssumeRole must be signed using the access key ID 
-# and secret access key of an IAM user or using existing temporary credentials.
-# The credentials can be in EC2 instance metadata, in environment variables, 
-# or in a configuration file, and will be discovered automatically by the 
-# client('sts') function. For more information, see the Python SDK docs:
-# http://boto3.readthedocs.io/en/latest/reference/services/sts.html
-# http://boto3.readthedocs.io/en/latest/reference/services/sts.html#STS.Client.assume_role
+parser = argparse.ArgumentParser(description="Creates an AWS console sign in link from an assumed role")
+parser.add_argument('-p',type=str, action="store", dest="profile",help="Profile inside of aws creds file you want used. Defaults to \"default\". If set, env variables are not read.",nargs='?')
+parser.add_argument('-c',type=str, action="store", dest="credfile",help="Absolute path to AWS credentials file. If set, env variables are not read.",nargs='?')
+args = parser.parse_args()
 
 
+if args.profile != None:
+    profile = args.profile
+else:
+    profile = "default"
 
 
+if args.credfile == None:
+    awsconfigfile = '/.aws/credentials'
+    home = expanduser("~")
+    credentialsfile = home + awsconfigfile
+else:
+    credentialsfile = args.credfile
+
+#########################End Arg parsing logic##################################
 
 
-# Step 3: Gather the AWS credentials. First try from environment variables, then look to ~.aws/credentials [default]
+# Step 1: Gather the AWS credentials. First try from environment variables, then look to ~.aws/credentials [default]
 #if the environment variables are set, use those. If not, fall back ~.aws/credentials [default]
-url_credentials = {}
-
-#TODO: make argument. for now use the default or deal with it
-awsconfigfile = '/.aws/credentials'
-home = expanduser("~")
-credentialsfile = home + awsconfigfile
 
 
-if environ.get('AWS_ACCESS_KEY_ID') != None:
+def getCredsFromEnv():
+    url_credentials = {}
     url_credentials['sessionId'] = environ.get('AWS_ACCESS_KEY_ID')
     url_credentials['sessionKey'] = environ.get('AWS_SECRET_ACCESS_KEY')
     url_credentials['sessionToken'] = environ.get('AWS_SESSION_TOKEN')
     json_string_with_temp_credentials = json.dumps(url_credentials)
-else:
-    #TODO, add support for n on-default profiles.
-    config = ConfigParser.RawConfigParser()
-    config.read(credentialsfile)
-    url_credentials['sessionId'] = config.get('default', 'aws_access_key_id')
-    url_credentials['sessionKey'] = config.get('default', 'aws_secret_access_key')
-    url_credentials['sessionToken'] = config.get('default', 'aws_session_token')
-    json_string_with_temp_credentials = json.dumps(url_credentials)
+    return(json_string_with_temp_credentials)
 
-# Step 4. Make request to AWS federation endpoint to get sign-in token. Construct the parameter string with
+
+
+def getCredsFromFile(profile,credentialsfile):
+    url_credentials = {}
+    config = ConfigParser.RawConfigParser()
+    try:
+        config.read(credentialsfile)
+    except:
+        raise("Could not open AWS credentials file")
+    url_credentials['sessionId'] = config.get("default", 'aws_access_key_id')
+    url_credentials['sessionKey'] = config.get(profile, 'aws_secret_access_key')
+    url_credentials['sessionToken'] = config.get(profile, 'aws_session_token')
+    json_string_with_temp_credentials = json.dumps(url_credentials)
+    return(json_string_with_temp_credentials)
+
+#Default behavior: if no arguments, first try environment, then try default aws credential file with 'default' profile
+if args.credfile == None and args.profile == None:
+    if environ.get('AWS_ACCESS_KEY_ID') != None:
+        json_string_with_temp_credentials = getCredsFromEnv()
+    else:
+        json_string_with_temp_credentials = getCredsFromFile(profile,credentialsfile)
+else:
+    json_string_with_temp_credentials = getCredsFromFile(profile,credentialsfile)
+
+
+# Step 2. Make request to AWS federation endpoint to get sign-in token. Construct the parameter string with
 # the sign-in action request, a 12-hour session duration, and the JSON document with temporary credentials 
 # as parameters.
 request_parameters = "?Action=getSigninToken"
@@ -62,9 +82,12 @@ request_parameters += "&Session=" + quote_plus_function(json_string_with_temp_cr
 request_url = "https://signin.aws.amazon.com/federation" + request_parameters
 r = requests.get(request_url)
 # Returns a JSON document with a single element named SigninToken.
-signin_token = json.loads(r.text)
+try:
+    signin_token = json.loads(r.text)
+except:
+    raise("Invalid JSON response from AWS Federation Service. Verify your AWS credentials exist and are valid")
 
-# Step 5: Create URL where users can use the sign-in token to sign in to 
+# Step 3: Create URL where users can use the sign-in token to sign in to 
 # the console. This URL must be used within 15 minutes after the
 # sign-in token was issued.
 request_parameters = "?Action=login" 
@@ -74,4 +97,6 @@ request_parameters += "&SigninToken=" + signin_token["SigninToken"]
 request_url = "https://signin.aws.amazon.com/federation" + request_parameters
 
 # Send final URL to stdout
+print ("")
 print (request_url)
+print ("")
