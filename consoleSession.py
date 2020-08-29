@@ -5,7 +5,11 @@ from os import environ
 from os.path import expanduser
 import configparser as ConfigParser
 import argparse
+'''
+The main repo for this project has been updated to https://github.com/Disgruntled/awsConsoleSession
 
+If you're not using that one, please consider updating to make sure you're getting the latest updates/enhancements.
+'''
 ############################Arg parsing logic##################################
 
 parser = argparse.ArgumentParser(description="Creates an AWS console sign in link from an assumed role")
