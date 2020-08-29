@@ -10,6 +10,22 @@ While you could tweak this to work with other FBL SAML IDPs, this has alot of en
 
 Two flavours of this script are provided, samlapi_formauth.py for python2 and samlap_formauth3.py for python3.
 
+## Invokation
+
+with the environment setup and the requirements installed you may simply invoke the script as itself without arguments for it to run
+
+Python 2:
+
+```bash
+samlapi_formauth.py
+```
+
+Python 3:
+
+```bash
+samlapi_formauth3.py
+```
+
 ## Getting a console session from the AWS credentials
 
 The script "consoleSession.py" will take the AWS access key/secret access key/session tokena and use them to create a url you can use for the AWS console.
@@ -70,7 +86,7 @@ output format/region to your own AWS taste
 
 ## Dependencies
 
-see requirements.txt
+see requirements.txt for python2 and requirements3.txt for python3
 
 note urlparse is folded into urllib in python3.
 
