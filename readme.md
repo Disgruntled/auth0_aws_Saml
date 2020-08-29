@@ -10,7 +10,7 @@ While you could tweak this to work with other FBL SAML IDPs, this has alot of en
 
 Two flavours of this script are provided, samlapi_formauth.py for python2 and samlap_formauth3.py for python3.
 
-## Invokation
+## Invocation
 
 with the environment setup and the requirements installed you may simply invoke the script as itself without arguments for it to run
 
@@ -57,14 +57,6 @@ python3 consoleSession.py --metadata
 ## Customizing to your environment
 
 This version .1 effort does not feature a config file and unfortunately the variables themselves will need to be modified.
-
-## Invocation
-
-Simply call the script with your python 2 executable after all dependencies have been resolved.
-
-after that you can then use the "saml" profile as it has been saved to your ~.aws/credentials file.
-
-This can be referenced in your aws SDK, or if using the cli add "--profile saml" to all your one-liners.
 
 ## Debugging
 
